@@ -4,6 +4,10 @@
   * written by: Julie He
 */
 
-int HIH6030_GetRHT(float *humidity, float *temperature);
+#ifndef HIH6030_H
+#define HIH6030_H
+#endif
+
+int HIH6030_GetRHT(float *hum, float *temp);
 
 int HIH6030_GetRHTStatus(void);

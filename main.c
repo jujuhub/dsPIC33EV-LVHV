@@ -46,10 +46,16 @@
   Section: Included Files
   *** NOTE: MUST INCLUDE "mcc.h" !! It contains the other .h files. ***
 */
+#include <stdio.h>
+#include <time.h>
+
 #include "mcc_generated_files/system.h"
 #include "mcc_generated_files/mcc.h"
+#include "hih6030-021/hih6030.h"
 
-#include "hih6030-021/HIH6030.h"
+// need to check return values in HIH6030.c
+#define RHT_OK 0
+#define RHT_NOTOK 1
 
 /*
                          Main application
@@ -59,8 +65,8 @@ int main(void)
     // initialize the device
     SYSTEM_Initialize();
 
-    int rht_status = 1;
-    uint16_t pin26;
+    int rht_status = RHT_OK;
+    uint16_t pin26 = 0;
 
     while (1)
     {
@@ -68,7 +74,7 @@ int main(void)
 
         // Photodiode
         // read pin 3 (RA1)
-        PhotoDiode_GetValue(); // returns uint16_t but pin 3 set to analog I
+//        PhotoDiode_GetValue(); // returns uint16_t but pin 3 set to analog I
 
         // LTC 2631 : DAC INTERFACE W/ HV_CTRL
         // read pins 14 (RB5), 15 (RB6)
@@ -76,24 +82,25 @@ int main(void)
 
         // HIH6030-021-001 : RELATIVE HUMIDITY AND TEMPERATURE 
         rht_status = HIH6030_GetRHTStatus();
-        if (rht_status == 0) 
+//        rht_status = RHT_NOTOK; // for debugging
+        if (rht_status == RHT_NOTOK)
         {
           // turn LV OFF; pin 26 (RB15)
-          printf("Turning off LV.. \n");
+//          printf("Turning off LV.. \n");
           LV_ON_OFF_SetLow();
           pin26 = LV_ON_OFF_GetValue(); // not sure if this is valid since output
-          if (pin26 == 0) // may want to make this a while loop
+          if (pin26 == 0)
           {
-            printf("LV successfully turned OFF ! \n");
+//            printf("LV successfully turned OFF ! \n");
           }
-          else
-          {
-            delay(3000);
-          }
-
-          // turn HV OFF; pin 12 (RA4)
-          printf("Turning off HV.. \n");
-          HV_ON_OFF_SetLow();
+//          else
+//          {
+//            delay(3000);
+//          }
+//
+//          // turn HV OFF; pin 12 (RA4)
+//          printf("Turning off HV.. \n");
+//          HV_ON_OFF_SetLow();
         }
         else
         {
@@ -102,17 +109,6 @@ int main(void)
     }
 
     return 1; 
-}
-
-void Temperature_Check()
-{
-    // checks temperature from sensors
-//    int status; 
-//    status = GetValue(of pins that are connected to sensors);
-//    if (status == high)
-//    {
-//        HV_ON_OFF(off!);
-//    }
 }
 
 /**
