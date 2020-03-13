@@ -51,11 +51,9 @@
 
 #include "mcc_generated_files/system.h"
 #include "mcc_generated_files/mcc.h"
-#include "hih6030-021/hih6030.h"
+//#include "hih6030-021/hih6030.h"
 
-// need to check return values in HIH6030.c
-#define RHT_OK 0
-#define RHT_NOTOK 1
+
 
 /*
                          Main application
@@ -65,8 +63,13 @@ int main(void)
     // initialize the device
     SYSTEM_Initialize();
 
-    int rht_status = RHT_OK;
-    uint16_t pin26 = 0;
+    // HIH6030 variables
+    int hih_status;
+    float rh, t_C;
+//    char hih_addr = 0x27;
+    
+    // LV variables
+    uint16_t pin26;
 
     while (1)
     {
@@ -80,31 +83,40 @@ int main(void)
         // read pins 14 (RB5), 15 (RB6)
 
 
-        // HIH6030-021-001 : RELATIVE HUMIDITY AND TEMPERATURE 
-        rht_status = HIH6030_GetRHTStatus();
-//        rht_status = RHT_NOTOK; // for debugging
-        if (rht_status == RHT_NOTOK)
+        /*
+         *  HIH6030-021-001 : RELATIVE HUMIDITY AND TEMPERATURE 
+         */
+        // fetch sensor status
+        hih_status = HIH6030_GetSensorStatus(&rh, &t_C);
+
+        if (hih_status == NORMAL) { printf("Normal.");} 
+        else if (hih_status == STALE_DATA) { printf("Stale data."); }
+        else if (hih_status == COMMAND) { printf("Command."); }
+        else if (hih_status == DIAGNOSTIC) { printf("Diagnostic."); }
+        
+        // check rh & temp_C
+        if (rh > 50. || t_C > 50.)
         {
-          // turn LV OFF; pin 26 (RB15)
-//          printf("Turning off LV.. \n");
-          LV_ON_OFF_SetLow();
-          pin26 = LV_ON_OFF_GetValue(); // not sure if this is valid since output
-          if (pin26 == 0)
-          {
-//            printf("LV successfully turned OFF ! \n");
-          }
-//          else
-//          {
-//            delay(3000);
-//          }
+            // turn LV OFF; pin 26 (RB15)
+//            printf("Turning off LV.. \n");
+            LV_ON_OFF_SetLow();
+            pin26 = LV_ON_OFF_GetValue(); // not sure if this is valid since output
+            if (pin26 == 0)
+            {
+//                printf("LV successfully turned OFF ! \n");
+            }
+//            else
+//            {
+//                delay(3000);
+//            }
 //
-//          // turn HV OFF; pin 12 (RA4)
-//          printf("Turning off HV.. \n");
-//          HV_ON_OFF_SetLow();
+//            // turn HV OFF; pin 12 (RA4)
+//            printf("Turning off HV.. \n");
+//            HV_ON_OFF_SetLow();
         }
         else
         {
-          printf("Relative humidity and temperature OK ! \n");
+            printf("Relative humidity and temperature OK ! \n");
         }
     }
 

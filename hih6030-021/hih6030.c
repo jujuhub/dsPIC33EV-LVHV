@@ -7,27 +7,19 @@
   * which can be found at
   * <github.com/ControlEverythingCommunity/HIH6020>
   *
-  * modified by: Julie He
+  * written by: Julie He
   *
 */
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <unistd.h>
-//#include <linux/i2c-dev.h>
-//#include <sys/ioctl.h>
-//#include <fcntl.h>
+
+#include "hih6030.h"
 
 int HIH6030_GetRHT(float *hum, float *temp)
 {
-  // Create I2C bus
-  int file;
-  char *bus = "/dev/i2c-1";
-/*  if ((file = open(bus, O_RDWR)) < 0)
-  {
-    printf("Failed to open the bus. \n");
-    exit(1);
-  }
+//  char addr = 0x27;
+/*  
   // Get I2C device. HIH6030 I2C address is 0x27
 //  ioctl(file, I2C_SLAVE, 0x27);
   sleep(1);
@@ -54,26 +46,29 @@ int HIH6030_GetRHT(float *hum, float *temp)
     printf("Temperature in Celsius: %.2f C \n", cTemp);
     printf("Temperature in Fahrenheit: %.2f F \n", fTemp);
   } */
+    return 1;
 }
 
-int HIH6030_GetRHTStatus()
+int HIH6030_GetSensorStatus(float *ptr_RH_dat, float *ptr_T_dat)
 {
-  // Get relative humidity and temperature
-/*  float rhmd, ctmp;
-  HIH6030_GetRHT(&rhmd, &ctmp);
+    char addr = 0x27; // #TODO: pass as arg?
+  
+    // Get relative humidity and temperature
+/*    float rhmd, ctmp;
+    HIH6030_GetRHT(&rhmd, &ctmp);
 
-  // Compare with critical relative humidity and temp
-  if (rhmd >= 0.5)
-  {
-    printf(" WARNING !! Relative humidity is above 50% ! \nTurning off LVHV board... \n");
-    return 0;
-  } else { return 1; }
+    // Compare with critical relative humidity and temp
+    if (rhmd >= 0.5)
+    {
+        printf(" WARNING !! Relative humidity is above 50% ! \nTurning off LVHV board... \n");
+        return 0;
+    } else { return 1; }
 
-  if (ctmp >= 50.)
-  {
-    printf(" WARNING !! Temperature is above 50 deg C ! \n Turning off LVHV board... \n");
-    return 0;
-  } else { return 1; }
+    if (ctmp >= 50.)
+    {
+        printf(" WARNING !! Temperature is above 50 deg C ! \n Turning off LVHV board... \n");
+        return 0;
+    } else { return 1; }
 */
-  return 1; // dbg
+    return RHT_NOTOK; // dbg
 }
